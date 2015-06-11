@@ -1,0 +1,26 @@
+{
+  "name": "comboedr",
+  "version": "1.0.0",
+  "description": "comboed require.js frontend and combo server backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SKing7/comboedr.git"
+  },
+  "keywords": [
+    "comboed",
+    "require"
+  ],
+  "author": "sking7",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SKing7/comboedr/issues"
+  },
+  "homepage": "https://github.com/SKing7/comboedr#readme",
+  "dependencies": {
+    "gulp": "^3.9.0"
+  }
+}
