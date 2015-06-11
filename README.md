@@ -23,7 +23,6 @@ combo server
 #### pathMap 
 同文件格式的目录的相对路径，基于cwd
 
-
     var comboServer = require('../service/combo')
     app.get('/combo/', new comboServer({
         cwd: 'test/public',
@@ -36,14 +35,37 @@ combo server
     }));
 
 
-### 前端
+### 页面引入必要文件
 
     <script src="require.js"></script>
     <script src="config.js"></script>
     <script src="loader.js"></script>
 
+### require.js
+仅支持amd声明方式，不支持exports.modules，只支持reuturn
 
-### 自定义配置：config.js
+### loader.js
+
+    new export.Loader(['file1', 'file2']);
+    
+####请求后端combo
+请求格式：
+
+    file_1@version_1;file_2@version_2
+
+require.js中的资源请求都是基于Loader来获得
+
+### 前端配置
+
+#### timeout（ms）
+ajax超时时间
+#### locPrefix
+localStorage前缀，localstorage缓存时的key的前缀
+#### webBase
+combo服务host
+#### exportLoader
+Loader实例导出
+window.Loader即可请求combo
 
     require.config({
        combo: {
