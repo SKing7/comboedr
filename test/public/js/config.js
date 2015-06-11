@@ -4,6 +4,7 @@ require.config({
         locPrefix: 'm_lsc_',
         webBase: 'combo'
     },
+    versionMap: {},
     paths: {},
     exportLoader: window
 
