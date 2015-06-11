@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/SKing7/comboedr#readme",
   "dependencies": {
+    "art-template": "^3.0.3",
     "express": "^4.12.4",
     "gulp": "^3.9.0",
     "gulp-copy": "0.0.2",

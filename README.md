@@ -1,5 +1,6 @@
 # comboedr
 重写require.js，支持前端combo
+combo server
 
 ##  特性
 1. 前后端combo + require
@@ -7,8 +8,9 @@
 3. 支持css和预编译的模板
 
 ##  DEMO
-gulp default
-http://127.0.0.1:8991/
+
+    gulp default
+    http://127.0.0.1:8991/
 
 ## Usage
 

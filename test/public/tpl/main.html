@@ -1,0 +1,14 @@
+<% if (!numPerPage) numPerPage = 10 %> 
+<div class="J_pagenavi o-pagenav clearfix" data-current="<%= current %>">
+    <% if (current == 1) { %>
+    <span class="nav-btn disable">上一页</span>
+    <% } else { %>
+    <span class="nav-btn J_prev">上一页</span>
+    <% } %>
+
+    <% if (hasNext) { %><!--  小于10个则已经到达最后一页 -->
+    <span class="nav-btn J_next">下一页</span>
+    <% } else { %>
+    <span class="nav-btn disable">下一页</span>
+    <% } %>
+</div>

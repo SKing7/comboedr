@@ -21,7 +21,7 @@ function initCombo(options) {
         rootPathMap = _.extend({}, options.pathMap);
         cwd = path.resolve(process.cwd(), options.cwd),
         versionPath = path.resolve(path.join(cwd, options.versionDir));
-        _.forEach(rootPathMap, function (k, v) {
+        _.forEach(rootPathMap, function (v, k) {
             rootPathMap[k] = path.join(cwd, v)
         });
     }
@@ -72,6 +72,7 @@ function initCombo(options) {
 
             fullPath = path.normalize(path.join(rootReletivePath, realName));
 
+            console.log(rootReletivePath);
             console.log(fullPath);
 
             //检查路径的安全性
@@ -204,7 +205,9 @@ function getJsonObj(versionPath){
     }
 }
 function wrapHtmlToScript(content, fileName) {
-    return content;
+    var template = require('art-template/node/template-native.js')
+    var compliledSource = template.compile(content)
+    return 'define("' + fileName + '.js", ["tpl/template"], function (a) {return a("' + fileName + '",' + compliledSource + ')});';
 }
 function wrapCssToScript(styles, name) {
     return "define('" + name+ ".js', [], function () {"

@@ -18,6 +18,7 @@ app.get('/combo/', new comboServer({
         js: 'js',
         html: 'tpl',
     },
+    compile: 'artTemplate'
 }));
 
 app.use(express.static('test/public'));
