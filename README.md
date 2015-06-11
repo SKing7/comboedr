@@ -5,7 +5,7 @@ combo server
 ##  特性
 1. 前后端combo + require
 2. 支持localstorage缓存
-3. 支持css和预编译的模板
+3. 支持css，js，【html（预编译）：TODO】）
 
 ##  DEMO
 
