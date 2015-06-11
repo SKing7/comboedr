@@ -1,5 +1,5 @@
 node_modules
-test/public/js/
+test/public/**/build/
 *.swp
 *.swn
 *.swo
