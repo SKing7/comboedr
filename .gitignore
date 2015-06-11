@@ -1,2 +1,6 @@
 node_modules
+test/public/js/
+*.swp
+*.swn
+*.swo
 

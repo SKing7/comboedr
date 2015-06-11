@@ -7,13 +7,16 @@
     var loaderMap = [];
     var noop = function () {};
 
-    var comboConf = M.comboConf;
-    var sep = comboConf.sep;
-    var versionMap = M.versionMap || {};
-    var comboBase = comboConf.base;
-    var locPrefix = comboConf.locPrefix;
-    var storagePrefix = comboConf.locPrefix;
+    var rconfig = require.config();
+
+    var comboConf = rconfig.combo;
+    var exportTo  = rconfig.exportLoader || window;
+    var sep =  "/*!__COMBO_SEPARATOR__*/";
+    var versionMap = rconfig.versionMap || {};
+    var comboBase = (comboConf.webBase || '') + '?f=';
+    var storagePrefix = comboConf.locPrefix || '';
     var TIMEOUT = comboConf.timeout;
+    var defaultVersion = new Date().getTime();
     var ATTR_MARKER = 'data-module';
 
     var domCreater = {
@@ -43,9 +46,9 @@
     };
     var assets = {
         getLoc: function (key) {
-            var v = this.getVersion(key) || M.v;
+            var v = this.getVersion(key) || defaultVersion;
             try {
-                var item = localStorage.getItem(locPrefix + key);
+                var item = localStorage.getItem(storagePrefix + key);
                 item = JSON.parse(item || '') || {};
                 if (item.v && item.v === v && item.data) return item;
             } catch(e) {
@@ -53,7 +56,7 @@
             return false;
         },
         addLoc: function (key, data) {
-            var v = this.getVersion(key) || M.v;
+            var v = this.getVersion(key) || defaultVersion;
             var obj = {};
             obj.stamp = new Date().getTime();
             //没有版本号的按发布版本来缓存
@@ -168,18 +171,10 @@
     };
     proto.appendToDoc = function () {
         var tmpDoc = doc.createDocumentFragment();
-        var prefix = 'define(\'.js\',[],function(){var s=document.createElement("style");s.innerHTML=\'';
-        var tail = '\';document.head.appendChild(s);return {"name": ""};});';
         var ex;
         var _t = this;
-        var domType = _t.opt.domType;
-        var opt = _t.opt;
         each(_t.loadMap, function (v, k) {
             ex = ext(k);
-            if (domType && ex !== domType) {
-                v = v.slice(prefix.length + k.length - ex.length - 1, -1 * (tail.length + k.length - ex.length - 1));
-                ex = domType;
-            }
             tmpDoc.appendChild(domCreater[ex](v, k));
         });
         head.appendChild(tmpDoc);
@@ -230,7 +225,7 @@
         }
         rt = comboBase + encodeURIComponent(rt.substr(0, rt.length - 1));
         if (noVersionInfo) {
-             rt += '&v=' + M.v;
+             rt += '&v=' + defaultVersion;
         }
         return rt;
     }
@@ -268,20 +263,5 @@
         return op.hasOwnProperty.call(obj, prop);
     }
 
-    function loadStandardModule() {
-        var path = document.location.pathname || '';
-        var moduleCssName = '';
-        if (path === '/') {
-            path = '/index/index/'
-        }
-        moduleCssName = path.split('/')[1];
-        if (moduleCssName && versionMap[moduleCssName + '.css']) {
-            new Loader([moduleCssName + '.css.js'], {
-                sync: true,
-                //加载js后以css形式加载到dom中
-                domType: 'css'
-            });
-        }
-    }
-    M.util.loader = Loader;
+    exportTo.Loader = Loader;
 }(this));

@@ -5,30 +5,31 @@ var codeSep = '/*!__COMBO_SEPARATOR__*/';
 var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
-var debug;
 var sep = path.sep;
-var rootPath;
 
-var versionPath = [__dirname, '..', '..', 'version.json'].join(sep);
+function initCombo(options) {
 
-var versionJson = getNowVersionMap();
-var relativeToRoot = path.join('..', '..');
+    var rootPathMap,
+        versionJson,
+        versionPath,
+        cwd;
 
-module.exports = {
-    init: function (app) {
-        var srcBaseUrl = relativeToRoot;
-        app.get('/combo/', this.handle);
-        debug = app.get('env') !== 'production';
-        rootPath = {
-            css: path.join(srcBaseUrl, 'css'),
-            js: path.join(srcBaseUrl, 'lib'),
-        };
-    },
+    resolvePath();
+    versionJson =  getJsonObj(versionPath);
 
-    handle: function (req, res, next) {
+    function resolvePath() {
+        rootPathMap = _.extend({}, options.pathMap);
+        cwd = path.resolve(process.cwd(), options.cwd),
+        versionPath = path.resolve(path.join(cwd, options.versionDir));
+        _.forEach(rootPathMap, function (k, v) {
+            rootPathMap[k] = path.join(cwd, v)
+        });
+    }
+
+    function Combo (req, res, next) {
         var rootReletivePath,
             url = req.url,
-            body,
+            body = [],
             q,
             combineFiles,
             type,
@@ -37,7 +38,7 @@ module.exports = {
             pending;
 
         q = parseQuery(url);
-        body = [];
+
         if (q.f) {
             fileList = q.f.split(FILE_SPLITER);
             userVersionMap = rmVersion(fileList);
@@ -47,35 +48,39 @@ module.exports = {
         if (!fileList || fileList.length === 0) {
             return handleError('type is null:' + fileList);
         }
+        //文件数量
         pending = fileList.length;
-        //debug: [all.js]
+
         _.forEach(fileList, function (v, k) {
-            var tmpFileArray = v.split('.');
-            var realName = filterFileName(tmpFileArray);
-            type = getExt(realName);
-            rootReletivePath = rootPath[type] || relativeToRoot;;
+            var realName = filterFileName(v);
+
+            //支持直接请求文件
             if (userVersionMap) {
                 //指定文件的版本不存在或者版本不一致
                 if (!versionJson || (userVersionMap[realName] && userVersionMap[realName] !== versionJson[realName])) {
                     return handleError('file version do not match:' + JSON.stringify(userVersionMap));
                 }
             }
-            readFileStep(k, v, type);
+            readFileStep(k, v);
         });
-        function readFileStep(index, keyName, type) {
-            var bodyContent;
-            var fullPath
-            var fileArray = keyName.split('.');
-            var realName = filterFileName(fileArray);
+        function readFileStep(index, originName) {
+            var bodyContent,
+                fullPath,
+                realName = filterFileName(originName),
+                type = getExt(realName),
+                rootReletivePath = rootPathMap[type] || cwd;
+
             fullPath = path.normalize(path.join(rootReletivePath, realName));
+
+            console.log(fullPath);
+
             //检查路径的安全性
             if ((!fullPath || fullPath.indexOf(rootReletivePath) !== 0)) {
-                return handleError('path is invalid:' + keyName);
+                return handleError('path is invalid:' + originName);
             }
-            fullPath = path.normalize(__dirname + '/' + fullPath);
             fs.readFile(fullPath, 'utf8', function (err, data) {
                 if (err) { 
-                    return handleError('read file error:' + keyName);
+                    return handleError('read file error:' + originName);
                 }
                 updateStatus(wrapperContent(data));
             });
@@ -88,7 +93,7 @@ module.exports = {
                 }
             }
             function wrapperContent(content) {
-                var tmpFileArray = fileArray;
+                var tmpFileArray = originName.split('.');
                 var len = tmpFileArray.length;
                 var realExt;
                 //例如main.css.js
@@ -130,7 +135,9 @@ module.exports = {
         }
     }
 
+    return Combo;
 }
+
 /*
  * 解析url得到query的对象形式
  **/
@@ -180,28 +187,17 @@ function getExt(filename) {
     return fileArray[len - 1];
 }
 //根据请求名字得到文件名；main.css.js->main.css
-function filterFileName(fileArray) {
+function filterFileName(fileName) {
+    var fileArray = fileName.split('.');
     if (fileArray.length > 2) {
         return fileArray.slice(0, -1).join('.')
     }
-    return fileArray.join('.')
-}
-/*
- * 文件version
- **/
-function getVersion(file) {
-    return file.substr(file.indexOf('@'));
-}
-/*
- * 文件名
- **/
-function getName(v) {
-    return v.substring(0, v.lastIndexOf('.'));
+    return fileName;
 }
 /*
  * 所有文件版本号map
  **/
-function getNowVersionMap(){
+function getJsonObj(versionPath){
     var versionExist = fs.existsSync(versionPath);
     if (versionExist) {
         return JSON.parse(fs.readFileSync(versionPath, 'utf-8'));
@@ -210,10 +206,11 @@ function getNowVersionMap(){
 function wrapHtmlToScript(content, fileName) {
     return content;
 }
-function wrapCssToScript(content, fileName) {
+function wrapCssToScript(styles, name) {
     return "define('" + name+ ".js', [], function () {"
     + "return (function(c){var d=document,a='appendChild',i='styleSheet',s=d.createElement('style');s.type='text/css';c=unescape(c);d.getElementsByTagName('head')[0][a](s);s[i]?s[i].cssText=c:s[a](d.createTextNode(c));})\n"
     + "('" + escape(styles) + "');\n"
     + "});"
 }
 
+module.exports = initCombo;

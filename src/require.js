@@ -8,10 +8,13 @@
     var noop = function () {};
     var callingModuleMap = [];
     var loadingMap = {};
-    var pathsConfig = M.requireConf.paths;
     var requireCounter = 0;
+    var liveConfig = {
+        combo: {
+        },
+        paths: {}
+    };
     var reqer;
-    var isPreRendered = M.re.isPreRendered; 
 
     var op = Object.prototype;
     var ostring = op.toString;
@@ -38,7 +41,7 @@
                 if (v) {
                     tmpDep = normalizeDep(name, v);
                     extName = ext(tmpDep);
-                    if (extName === 'css' || extName === 'html') {
+                    if (extName && extName !== 'js') {
                         parsedDeps[k] = tmpDep + '.js'; 
                     } else {
                         parsedDeps[k] = tmpDep; 
@@ -114,6 +117,8 @@
         return true;
     };
     proto.initLoadDepQueue = function () {
+        var rconfig = require.config();
+        var exportTo  = rconfig.exportLoader || window;
         var resQueue = [];
         var mdQueue = [];
         var _t = this;
@@ -124,6 +129,7 @@
             if (!hasProp(modulesDef, dep)) {
                 mdQueue.push(dep);
                 tmpPath = getPath(dep);
+                //TODO
                 if (tmpPath !== dep) {
                     shimedModules.push(dep);
                 }
@@ -139,7 +145,7 @@
         });
         resLength = resQueue.length;
         if (resLength && !moduleError) {
-            new M.util.loader(resQueue, null, function () {
+            new exportTo.Loader(resQueue, null, function () {
                 each(shimedModules, function (v) {
                     modulesDef[v] = new Module(v, [], noop);
                 });
@@ -192,10 +198,15 @@
         define: function (name, deps, cb) {
             deps = deps || [];
             if (!type(deps, 'array')) {
-                makeError('非法定义模块', name, null, deps);
+                if (type(deps, 'function')) {
+                    cb = deps;
+                    deps = [];
+                } else {
+                    makeError('非法定义模块', name, null, deps);
+                }
             }
             modulesDef[name] = new Module(name, deps, cb);
-        }
+        },
     };
 
     function checkCalledQueue() {
@@ -282,24 +293,16 @@
         return op.hasOwnProperty.call(obj, prop);
     }
     function getPath(dep) {
-        return pathsConfig[dep] || dep;
-    }
-    function initDefedModules() {
-        var modules = document.querySelectorAll('[data-module]');
-        [].forEach.call(modules, function (node) {
-            var name = node.getAttribute('data-module')
-            var ext = name.split('.');
-            if (ext[ext.length - 1] === 'js' && ext[ext.length - 2] === 'css') {
-                modulesDef[name] = new Module(name, [], function () {
-                    return {name: name};
-                }); 
-            }
-        });
+        return dep; //pathsConfig[dep] || 
     }
     reqer.define.amd = { jQuery: true };
     window.require = reqer.require;
     window.define = reqer.define;
-    if (isPreRendered) {
-        initDefedModules();
+
+    require.config = function (config) {
+        if (typeof config === 'object') {
+            liveConfig = config;
+        }
+        return liveConfig;
     }
 }(this));

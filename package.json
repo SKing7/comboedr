@@ -21,6 +21,11 @@
   },
   "homepage": "https://github.com/SKing7/comboedr#readme",
   "dependencies": {
-    "gulp": "^3.9.0"
+    "express": "^4.12.4",
+    "gulp": "^3.9.0",
+    "gulp-copy": "0.0.2",
+    "gulp-nodemon": "^2.0.3",
+    "gulp-watch": "^4.2.4",
+    "lodash": "^3.9.3"
   }
 }
