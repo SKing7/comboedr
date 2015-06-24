@@ -1,11 +1,11 @@
 # comboedr
-重写require.js，支持前端combo
+orewrite require.js，support for combo server
 combo server
 
 ##  特性
-1. 前后端combo + require
-2. 支持localstorage缓存
-3. 支持css，js，html（预编译）[TODO:暂只支持artTemplate预编译html]）
+1. combo + require
+2. support for localstorage cache 
+3. resrouces of css，js，html（precompile）[TODO:only for artTemplate now]）
 
 ##  DEMO
 
@@ -17,11 +17,11 @@ combo server
 ### Combo Server
 
 #### cwd 
-资源目录的相对路径，基于process.cwd
+relative path，base on `process.cwd`
 #### versionDir 
-生成文件md5值的json格式文件路径，基于cwd
+md5 json file path，base on cwd
 #### pathMap 
-同文件格式的目录的相对路径，基于cwd
+relative path of resource by file type，base on cwd
 
     var comboServer = require('../service/combo')
     app.get('/combo/', new comboServer({
@@ -35,48 +35,46 @@ combo server
     }));
 
 
-### 页面引入必要文件
+### include scripts
 
     <script src="require.js"></script>
     <script src="config.js"></script>
     <script src="loader.js"></script>
 
 ### require.js
-仅支持amd声明方式，不支持exports.modules，只支持reuturn
+only support amd and return
 
 ### loader.js
 
     new export.Loader(['file1', 'file2']);
     
 ####请求后端combo
-请求格式：
+combo url format：
 
     file_1@version_1;file_2@version_2
 
-require.js中的资源请求都是基于Loader来获得
 
 ### 前端配置
 
 #### timeout（ms）
-ajax超时时间
+the wating time of loader
 #### locPrefix
-localStorage前缀，localstorage缓存时的key的前缀
+localStorage prefix
 #### webBase
-combo服务host
+combo host name
 #### exportLoader
-Loader实例导出
-window.Loader即可请求combo
+export the Loader instance to 
 
     require.config({
        combo: {
-           timeout: 60000, //ajax超时时间
-           locPrefix: 'm_lsc_', //localStorage前缀
-           webBase: 'combo' //combo服务host
+           timeout: 60000,
+           locPrefix: 'm_lsc_',
+           webBase: 'combo'
        },
-       exportLoader: window //Loader实例导出
+       exportLoader: window
     });
 
-### 调用
+### UESAGE
 
     require(['test-1', 'test-2', 'base.css'], function () {
         //callback

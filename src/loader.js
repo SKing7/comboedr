@@ -28,20 +28,6 @@
                 script.setAttribute(ATTR_MARKER,  name);
             }
             return script;
-        },
-        css: function (css, name) {
-            if (!css) return;
-            var style = doc.createElement('style');
-            style.type = 'text/css';
-            if (name) {
-                style.setAttribute(ATTR_MARKER,  name);
-            }
-            if (style.styleSheet){
-                style.styleSheet.cssText = css;
-            } else {
-                style.appendChild(doc.createTextNode(css));
-            }
-            return style;
         }
     };
     var assets = {

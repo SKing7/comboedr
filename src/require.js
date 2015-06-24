@@ -12,7 +12,6 @@
     var liveConfig = {
         combo: {
         },
-        paths: {}
     };
     var reqer;
 
