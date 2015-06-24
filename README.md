@@ -48,13 +48,13 @@ only support amd and return
 
     new export.Loader(['file1', 'file2']);
     
-####请求后端combo
+####COMBO server
 combo url format：
 
     file_1@version_1;file_2@version_2
 
 
-### 前端配置
+### requirejs OPTIONS
 
 #### timeout（ms）
 the wating time of loader
