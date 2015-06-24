@@ -1,8 +1,9 @@
 # comboedr
-orewrite require.js，support for combo server
+rewrite require.js:support for combo server
+Loader
 combo server
 
-##  特性
+##  FEATURE
 1. combo + require
 2. support for localstorage cache 
 3. resrouces of css，js，html（precompile）[TODO:only for artTemplate now]）
